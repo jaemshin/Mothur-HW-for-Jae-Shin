@@ -1,0 +1,79 @@
+---
+title: "Micbiol HW 612 OTU"
+author: "Jae M. Shin"
+date: "April 26, 2016"
+output: html_document
+---
+
+# Reclassifying OTUs with Silva
+
+```{r}
+mothur > make.contigs(file=stability.files, processors=8)
+mothur > summary.seqs(fasta=stability.trim.contigs.fasta)
+mothur > screen.seqs(fasta=stability.trim.contigs.fasta, group=stability.contigs.groups, maxambig=0, maxlength=275)
+mothur > screen.seqs(fasta=stability.trim.contigs.fasta, group=stability.contigs.groups, summary=stability.trim.contigs.summary, maxambig=0, maxlength=275)
+mothur > get.current()
+mothur > unique.seqs(fasta=stability.trim.contigs.good.fasta)
+mothur > count.seqs(name=stability.trim.contigs.good.names, group=stability.contigs.good.groups)
+mothur > summary.seqs(count=stability.trim.contigs.good.count_table)
+mothur > pcr.seqs(fasta=silva.bacteria.fasta, start=11894, end=25319, keepdots=F, processors=8)
+mothur > system(mv silva.bacteria.pcr.fasta silva.v4.fasta)
+mothur > summary.seqs(fasta=silva.v4.fasta)
+mothur > align.seqs(fasta=stability.trim.contigs.good.unique.fasta, reference=silva.v4.fasta)
+mothur > summary.seqs(fasta=stability.trim.contigs.good.unique.align, count=stability.trim.contigs.good.count_table)
+mothur > screen.seqs(fasta=stability.trim.contigs.good.unique.align, count=stability.trim.contigs.good.count_table, summary=stability.trim.contigs.good.unique.summary, start=1968, end=11550, maxhomop=8)
+mothur > summary.seqs(fasta=current, count=current)
+mothur > filter.seqs(fasta=stability.trim.contigs.good.unique.good.align, vertical=T, trump=.)
+mothur > unique.seqs(fasta=stability.trim.contigs.good.unique.good.filter.fasta, count=stability.trim.contigs.good.good.count_table)
+mothur > pre.cluster(fasta=stability.trim.contigs.good.unique.good.filter.unique.fasta, count=stability.trim.contigs.good.unique.good.filter.count_table, diffs=2)
+mothur > chimera.uchime(fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.fasta, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.count_table, dereplicate=t)
+mothur > remove.seqs(fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.fasta, accnos=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.accnos)
+mothur > summary.seqs(fasta=current, count=current)
+mothur > classify.seqs(fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.fasta, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.count_table, reference=silva.bacteria.fasta, taxonomy=silva.bacteria.silva.tax, cutoff=80)
+mothur > remove.lineage(fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.fasta, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.count_table, taxonomy=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.silva.wang.taxonomy, taxon=Chloroplast-Mitochondria-unknown-Archaea-Eukaryota)
+mothur > get.groups(count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.count_table, fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.fasta, groups=Mock)
+mothur > seq.error(fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.fasta, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table, reference=HMP_MOCK.v35.fasta, aligned=F)
+mothur > dist.seqs(fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.fasta, cutoff=0.20)
+mothur > cluster(column=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.dist, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table)
+mothur > make.shared(list=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.an.unique_list.list, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table, label=0.03)
+mothur > rarefaction.single(shared=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.an.unique_list.shared)
+mothur > remove.groups(count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.count_table, fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.fasta, taxonomy=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.silva.wang.pick.taxonomy, groups=Mock)
+mothur > dist.seqs(fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.fasta, cutoff=0.20)
+mothur > cluster(column=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.dist, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table)
+mothur > cluster.split(fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.fasta, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table, taxonomy=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.silva.wang.pick.pick.taxonomy, splitmethod=classify, taxlevel=4, cutoff=0.15)
+mothur > make.shared(list=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.an.unique_list.list, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table, label=0.03)
+mothur > classify.otu(list=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.an.unique_list.list, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table, taxonomy=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.silva.wang.pick.pick.taxonomy, label=0.03)
+mothur > system(mv stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.an.unique_list.shared stability.an.shared)
+mothur > system(mv stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.an.unique_list.0.03.cons.taxonomy stability.an.cons.taxonomy)
+mothur > count.groups(shared=stability.an.shared)
+mothur > sub.sample(shared=stability.an.shared, size=2241)
+mothur > rarefaction.single(shared=stability.an.shared, calc=sobs, freq=100)
+mothur > summary.single(shared=stability.an.shared, calc=nseqs-coverage-sobs-invsimpson, subsample=2441)
+mothur > heatmap.bin(shared=stability.an.0.03.subsample.shared, scale=log2, numotu=50) 
+mothur > dist.shared(shared=stability.an.shared, calc=thetayc-jclass, subsample=2241)
+mothur > heatmap.sim(phylip=stability.an.thetayc.0.03.lt.ave.dist)
+mothur > heatmap.sim(phylip=stability.an.jclass.0.03.lt.ave.dist)
+mothur > venn(shared=stability.an.0.03.subsample.shared, groups=F3D0-F3D1-F3D2-F3D3)
+mothur > tree.shared(phylip=stability.an.thetayc.0.03.lt.ave.dist)
+mothur > parsimony(tree=stability.an.thetayc.0.03.lt.ave.tre, group=mouse.time.design,  groups=all)
+mothur > pcoa(phylip=stability.an.thetayc.0.03.lt.ave.dist)
+
+
+```
+
+# Comparing the pcoa plots using Silva or rdp
+
+```{r, echo=FALSE}
+setwd("/Users/jaeshin/Desktop/MotherWorkshop_Schloss_Microbiol_612/mothur_HW")
+
+pcoasilva <- read.table(file="silva.stability.an.thetayc.0.03.lt.ave.pcoa.axes", header=T)
+
+plot(pcoasilva$axis1, pcoasilva$axis2, pch=19)
+
+pcoardp <-read.table(file="rdp.stability.an.thetayc.0.03.lt.ave.pcoa.axes", header=T)
+
+plot(pcoardp$axis1, pcoardp$axis2, pch=19)
+```
+
+
+* After comparing the two pcoa plots using silva or rdp reference files, I found that there was no difference. 
